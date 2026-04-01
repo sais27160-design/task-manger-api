@@ -1,0 +1,37 @@
+PROJECT/
+├── api/
+│   ├── __pycache__/
+│   ├── models/
+│   │   ├── __pycache__/
+│   │   ├── __init__.py
+│   │   ├── task_request.py
+│   │   └── task_response.py
+│   ├── routers/
+│   │   ├── __pycache__/
+│   │   ├── __init__.py
+│   │   └── tasks.py
+│   └── __init__.py
+├── repositories/
+│   ├── __pycache__/
+│   ├── models/
+│   │   ├── __pycache__/
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── task_orm.py
+│   │   └── user_orm.py
+│   ├── __init__.py
+│   └── task_repository.py
+├── services/
+│   ├── __pycache__/
+│   ├── models/
+│   │   ├── __pycache__/
+│   │   ├── __init__.py
+│   │   └── task_rule.py
+│   ├── __init__.py
+│   └── task_service.py
+├── __init__.py
+├── db.py
+├── index.html
+├── main.py
+├── project_structure.txt
+└── tasks.db

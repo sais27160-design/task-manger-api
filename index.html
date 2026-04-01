@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Manager</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .app {
+      width: 500px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .add-btn {
+      width: 100%;
+      background: #22c55e;
+      color: white;
+    }
+
+    .task {
+      background: #334155;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .actions button {
+      margin-left: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
+    .edit { background: #3b82f6; color: white; }
+    .delete { background: #ef4444; color: white; }
+    .save { background: #22c55e; color: white; }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <h1>🚀 Task Manager</h1>
+
+  <div class="card">
+    <h2>Add Task</h2>
+    <input id="title" placeholder="Task title">
+    <textarea id="desc" placeholder="Description"></textarea>
+    <button class="add-btn" onclick="addTask()">Add Task</button>
+  </div>
+
+  <div class="card">
+    <h2>My Tasks</h2>
+    <div id="list"></div>
+  </div>
+
+</div>
+
+<script>
+const API = "/tasks/";
+
+async function loadTasks() {
+  const res = await fetch(API);
+  const data = await res.json();
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "task";
+
+    div.innerHTML = `
+      <div class="task-left">
+        <input type="checkbox" ${t.done ? "checked" : ""} onchange="toggleDone(${t.id}, this.checked)">
+        <div class="task-text ${t.done ? "done" : ""}">
+          <b>${t.title}</b><br>
+          <small>${t.description || ""}</small>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="edit" onclick="editTask(${t.id}, '${t.title}', '${t.description || ""}')">Edit</button>
+        <button class="delete" onclick="deleteTask(${t.id})">Delete</button>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+async function addTask() {
+  const title = document.getElementById("title").value;
+  const description = document.getElementById("desc").value;
+  if (!title) return alert("Title required");
+
+  await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, description })
+  });
+
+  document.getElementById("title").value = "";
+  document.getElementById("desc").value = "";
+
+  loadTasks();
+}
+
+async function deleteTask(id) {
+  // FIXED: Removed the extra slash
+  await fetch(`${API}${id}`, { method: "DELETE" });
+  loadTasks();
+}
+
+async function toggleDone(id, done) {
+  // FIXED: Removed the extra slash
+  await fetch(`${API}${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ done })
+  });
+  loadTasks();
+}
+
+function editTask(id, title, desc) {
+  const newTitle = prompt("Edit title:", title);
+  const newDesc = prompt("Edit description:", desc);
+  if (newTitle !== null) updateTask(id, newTitle, newDesc);
+}
+
+async function updateTask(id, title, description) {
+  // FIXED: Removed the extra slash
+  await fetch(`${API}${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, description, done: false })
+  });
+  loadTasks();
+}
+
+// Load tasks when page opens
+loadTasks();
+</script>
+
+</body>
+</html>
